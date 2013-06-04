@@ -86,8 +86,10 @@ public class Chinchila_Genetic_algorithm {
 		String daughter;
 		String son;
 		if(randProb<CrossoverProbability){
+			int crossoverIndex = 0 + (int)(Math.random() * ((father.length()-1 - 0) + 1));
 			daughter =mother.substring(0, (mother.length()/2)-1)+father.substring(father.length()/2, father.length()-1);
-			son =father.substring(0, (mother.length()/2)-1)+mother.substring(father.length()/2, father.length()-1);
+			son =father.substring(0, crossoverIndex1)
+				+mother.substring(crossoverIndex, father.length()-1);
 		}else{
 			daughter = mother;
 			son = father;
