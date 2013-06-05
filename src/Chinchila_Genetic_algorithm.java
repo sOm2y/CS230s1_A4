@@ -89,10 +89,12 @@ public class Chinchila_Genetic_algorithm {
 		
 		
 		if(randProb<CrossoverProbability){
+
 			/**set random index from part of mother and part of father*/
 			int crossoverIndex = 0 + (int)(Math.random() * ((parent.length()-1 - 0) + 1));
 			child =parent.substring(0, crossoverIndex)+parent.substring(crossoverIndex);
 			
+
 		}else{
 			child = parent;
 			

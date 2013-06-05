@@ -218,11 +218,11 @@ public class Chinchila_GUI extends JFrame implements ActionListener {
 									String mamaDNA = curDNA[mama];				//get string of this Index in curDNA array
 									String papaDNA = curDNA[papa];
 												
-									curDNA[mama]= gal.breeding(mamaDNA);
-									//newGenIndex++;
-									curDNA[papa] = gal.breeding(papaDNA);	
-									//newGenIndex++;
-									//System.out.println(j);									
+									curDNA[newGenIndex]= gal.breeding(mamaDNA);
+									newGenIndex++;
+									curDNA[newGenIndex] = gal.breeding(papaDNA);	
+									newGenIndex++;
+									System.out.println(j);									
 								}
 							genCounter++;
 							
@@ -237,7 +237,7 @@ public class Chinchila_GUI extends JFrame implements ActionListener {
 							}
 						
 						
-						//Thread.sleep(100);
+						Thread.sleep(100);
 					
 					dtrpnToBeOr.setBackground(Color.PINK);
 					return null;
