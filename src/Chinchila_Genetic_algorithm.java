@@ -83,31 +83,48 @@ public class Chinchila_Genetic_algorithm {
 		throw new RuntimeException("Should never reach here here.");
 	}
 	
-	public String breeding(String parent){
+	public String[] breeding(String mama,String papa){
 		double randProb = ThreadLocalRandom.current().nextDouble(1.0);
-		String child;
-		
+		String daughter;
+		String son;
 		
 		if(randProb<CrossoverProbability){
 
 			/**set random index from part of mother and part of father*/
-			int crossoverIndex = 0 + (int)(Math.random() * ((parent.length()-1 - 0) + 1));
-			child =parent.substring(0, crossoverIndex)+parent.substring(crossoverIndex);
-			
+			int crossoverIndex = 1 + (int)(Math.random() * ((papa.length() - 1) + 1));
+			son =papa.substring(0, crossoverIndex)+mama.substring(crossoverIndex);
+			daughter =mama.substring(0, crossoverIndex)+mama.substring(crossoverIndex);
 
 		}else{
-			child = parent;
+			son = papa;
+			daughter=mama;
+		}
+		if(randProb<MutationProbability){
+			/**change one character from mother*/
+			String ranChar = generateRandomMonkey(1,generateStrings());			//set 1 character string
+			int ranIndex = 0 + (int)(Math.random() * ((papa.length()-1 - 0) + 1));//get random index	
+			
+			son = papa.replace(papa.charAt(ranIndex), ranChar.charAt(0));//replace that index character to random character
 			
 		}
 		if(randProb<MutationProbability){
 			/**change one character from mother*/
 			String ranChar = generateRandomMonkey(1,generateStrings());			//set 1 character string
-			int ranIndex = 0 + (int)(Math.random() * ((parent.length()-1 - 0) + 1));//get random index			
-			child = parent.replace(parent.charAt(ranIndex), ranChar.charAt(0));//replace that index character to random character
+			int ranIndex = 0 + (int)(Math.random() * ((mama.length()-1 - 0) + 1));//get random index	
+			
+			daughter = mama.replace(mama.charAt(ranIndex), ranChar.charAt(0));//replace that index character to random character
+			
 		}
 		
 		
-		return child;
+		 return new String[] {son , daughter};
 	}
-
+	
+	public int sumBreedingWeight(int largestDifference, int currentDifference[], int populationSize){
+		int sumBreWeht = 0;
+		for(int i = 0; i<populationSize;i++){
+			sumBreWeht = sumBreWeht+largestDifference-currentDifference[i]+1;
+		}
+		return sumBreWeht;
+	}
 }

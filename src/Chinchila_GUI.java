@@ -84,6 +84,7 @@ public class Chinchila_GUI extends JFrame implements ActionListener {
 		contentPane.add(chckbxNewCheckBox);
 
 		dtrpnToBeOr = new JEditorPane();
+		dtrpnToBeOr.setFont(new Font("Arial", Font.BOLD, 16));
 		dtrpnToBeOr.setEnabled(false);
 		dtrpnToBeOr.setBackground(new Color(204, 204, 153));
 		dtrpnToBeOr.setEditable(false);
@@ -100,6 +101,7 @@ public class Chinchila_GUI extends JFrame implements ActionListener {
 		textField.setColumns(10);
 
 		dtrpnToBeOr_1 = new JEditorPane();
+		dtrpnToBeOr_1.setFont(new Font("Bradley Hand ITC", Font.BOLD, 16));
 		dtrpnToBeOr_1.setText("To be or not to be, that is the question; Whether 'tis nobler in the mind to suffer The slings and arrows of outrageous fortune, Or to take arms against a sea of troubles, And by opposing, end them.");
 
 		dtrpnToBeOr_1.setBackground(new Color(204, 204, 153));
@@ -146,6 +148,7 @@ public class Chinchila_GUI extends JFrame implements ActionListener {
 	}
 
 	public void actionPerformed(ActionEvent e) {
+		 
 		
 		JFrame frame = this;
 		
@@ -172,8 +175,9 @@ public class Chinchila_GUI extends JFrame implements ActionListener {
 			sw = new SwingWorker<Void, String>() {
 				@Override
 				protected Void doInBackground() throws Exception {
+					
 					Chinchila_Genetic_algorithm gal = new Chinchila_Genetic_algorithm();
-					int x=0;
+					int timer=0;
 					int diffLagst = 0;
 					int matchLagst =0;
 					int genCounter=0;
@@ -190,6 +194,7 @@ public class Chinchila_GUI extends JFrame implements ActionListener {
 					
 					
 					for (int i = 0; i < pop; i++) {	
+						
 							if (this.isCancelled())
 								break;
 							if(dtrpnToBeOr_1.getText().equals(dtrpnToBeOr.getText()))
@@ -203,51 +208,67 @@ public class Chinchila_GUI extends JFrame implements ActionListener {
 								matchLagst=gal.match(tarContent, curDNA[i]);	//and set it on GUI
 								dtrpnToBeOr.setText(curDNA[i]);					
 							}	
-
-							if (i == (pop - 1)) {		
+							//System.out.println(i);		
+							if (i == (pop - 1)) {
+								
 								String newGeneDNA[]=new String[pop];
 								int newGenIndex =0;//if it's the last chinchila of this generation
 								for (int j = 0; j < pop / 2; j++) {
 									
 									int mama = gal.randomParent(				//select random mama and papa from this generation
-											tarContent.length(), diffLagst,
+											gal.sumBreedingWeight(diffLagst, curDiff, pop), diffLagst,
 											curDiff);
 									int papa = gal.randomParent(
-											tarContent.length(), diffLagst,
+											gal.sumBreedingWeight(diffLagst, curDiff, pop), diffLagst,
 											curDiff);
 									String mamaDNA = curDNA[mama];				//get string of this Index in curDNA array
 									String papaDNA = curDNA[papa];
 												
-									curDNA[newGenIndex]= gal.breeding(mamaDNA);
+									curDNA[newGenIndex]= gal.breeding(mamaDNA,papaDNA)[0];
 									newGenIndex++;
-									curDNA[newGenIndex] = gal.breeding(papaDNA);	
+									curDNA[newGenIndex]= gal.breeding(mamaDNA,papaDNA)[1];
 									newGenIndex++;
-									System.out.println(j);									
+									
+																		
 								}
 							genCounter++;
 							
 							i=0;//recycle
-							lblNewLabel_4.setText(Integer.toString(genCounter));					
-							}							
-						}
-						
-							if (x % 10 == 0) {
-								publish(String.valueOf(x / 10));
+							lblNewLabel_4.setText(Integer.toString(genCounter));
+							if (genCounter % 10 == 0){
+								timer=genCounter/185;
+								publish(String.valueOf(timer));
 								
 							}
+//							if((genCounter/timer)% 10==0){
+//							lblNewLabel_5.setText(String.valueOf(genCounter/timer));	
+//							}
+							}
+							
+							
+						}
 						
+							
+					
 						
-						Thread.sleep(100);
+					
+						
+						//
 					
 					dtrpnToBeOr.setBackground(Color.PINK);
+					// ... the code being measured ...  
+					//
+					
 					return null;
 				}
 
 				@Override
 				protected void process(List<String> chunks) {
-					// if (flag == true)
-					lblUpdateTime.setText(chunks.get(0));
-
+					if (flag == true)
+					
+						
+					lblUpdateTime.setText(String.valueOf(chunks.get(0)));
+					
 					super.process(chunks);
 				}
 
