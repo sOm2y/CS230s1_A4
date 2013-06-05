@@ -9,9 +9,7 @@ public class Chinchila_Genetic_algorithm {
 	final double CrossoverProbability = 0.87;
 	final double MutationProbability = 0.02;
 
-	/**
-	 * create the initial random population, size is target text length
-	 */
+	
 	public char[] generateStrings() {
 		char[] validChars = new char[2 + 95]; // NL, CR, printable ascii
 												// characters
@@ -23,7 +21,9 @@ public class Chinchila_Genetic_algorithm {
 
 		return validChars;
 	}
-
+	/**
+	 * create the initial random population, size is target text length
+	 */
 	public String generateRandomMonkey(final int size, final char[] validChars) {
 		StringBuilder sb = new StringBuilder(size);
 
@@ -49,6 +49,7 @@ public class Chinchila_Genetic_algorithm {
 
 		return diff;
 	}
+	
 	public int match(String target, String currentPop) {
 		if (target.length() != currentPop.length())
 			throw new RuntimeException("Strings need to be of equal length");
@@ -81,31 +82,30 @@ public class Chinchila_Genetic_algorithm {
 
 		throw new RuntimeException("Should never reach here here.");
 	}
-	public void breeding(String mother,String father){
+	
+	public String breeding(String parent){
 		double randProb = ThreadLocalRandom.current().nextDouble(1.0);
-		String daughter;
-		String son;
+		String child;
+		
+		
 		if(randProb<CrossoverProbability){
-			daughter =mother.substring(0, (mother.length()/2)-1)+father.substring(father.length()/2, father.length()-1);
-			son =father.substring(0, (mother.length()/2)-1)+mother.substring(father.length()/2, father.length()-1);
+			/**set random index from part of mother and part of father*/
+			int crossoverIndex = 0 + (int)(Math.random() * ((parent.length()-1 - 0) + 1));
+			child =parent.substring(0, crossoverIndex)+parent.substring(crossoverIndex);
+			
 		}else{
-			daughter = mother;
-			son = father;
+			child = parent;
+			
 		}
 		if(randProb<MutationProbability){
-			String ranChar = generateRandomMonkey(1,generateStrings());
-			int ranIndex = 0 + (int)(Math.random() * ((mother.length()-1 - 0) + 1));
-			
-			daughter = mother.replace(mother.charAt(ranIndex), ranChar.charAt(0));
+			/**change one character from mother*/
+			String ranChar = generateRandomMonkey(1,generateStrings());			//set 1 character string
+			int ranIndex = 0 + (int)(Math.random() * ((parent.length()-1 - 0) + 1));//get random index			
+			child = parent.replace(parent.charAt(ranIndex), ranChar.charAt(0));//replace that index character to random character
 		}
-		if(randProb<MutationProbability){
-			String ranChar = generateRandomMonkey(1,generateStrings());
-			int ranIndex = 0 + (int)(Math.random() * ((father.length()-1 - 0) + 1));
-			
-			son = father.replace(father.charAt(ranIndex), ranChar.charAt(0));
-		}
-		mother = daughter;
-		father = son;
+		
+		
+		return child;
 	}
 
 }
