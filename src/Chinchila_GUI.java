@@ -37,6 +37,9 @@ public class Chinchila_GUI extends JFrame implements ActionListener {
 	private JLabel lblNewLabel_4;
 	private JLabel lblNewLabel_5;
 	private SwingWorker<Void, String> sw;
+	private SwingWorker<Void, String> sw1;
+	private SwingWorker<Void, String> sw2;
+	private SwingWorker<Void, String> sw3;
 
 	/**
 	 * Create the frame.
@@ -153,8 +156,16 @@ public class Chinchila_GUI extends JFrame implements ActionListener {
 		JFrame frame = this;
 		
 		if (e.getSource() == btnNewButton) {
+			final boolean flag = chckbxNewCheckBox.isSelected();
 			if (btnNewButton.getActionCommand() == "Cancel") {
+				if(flag==true){
 				sw.cancel(true);
+				sw1.cancel(true);
+				sw2.cancel(true);
+				sw3.cancel(true);
+				}else{
+					sw.cancel(true);
+				}
 				return;
 			}
 
@@ -170,9 +181,118 @@ public class Chinchila_GUI extends JFrame implements ActionListener {
 			dtrpnToBeOr_1.setEnabled(false);
 			dtrpnToBeOr.setBackground(new Color(255, 235, 205));	
 			
-			final boolean flag = chckbxNewCheckBox.isSelected();
+			
 			
 			sw = new SwingWorker<Void, String>() {
+				@Override
+				protected Void doInBackground() throws Exception {
+					
+					Chinchila_Genetic_algorithm gal = new Chinchila_Genetic_algorithm();
+					int timer=0;
+					int diffLagst = 0;
+					int matchLagst =0;
+					int genCounter=0;
+					int[] curDiff = new int[pop];			//set array size of  fitness for each chinchila 
+					String[] curDNA = new String[pop];		//set random string array size
+					
+					for(int i=0;i<pop;i++){
+					String curChiChi = gal.generateRandomMonkey(
+							tarContent.length(), gal.generateStrings());
+					curDNA[i] = curChiChi;
+				
+					}										//set random string to each chinchila DNA
+					
+					
+					
+					for (int i = 0; i < pop; i++) {	
+						
+						if (this.isCancelled())
+							break;
+						if(dtrpnToBeOr_1.getText().equals(dtrpnToBeOr.getText()))
+							break;
+						if (diffLagst < gal.diff(tarContent, curDNA[i]))	//find largest difference of this generation
+							diffLagst = gal.diff(tarContent, curDNA[i]);		
+							
+						curDiff[i] = gal.diff(tarContent, curDNA[i]);		//store current difference to array
+							
+						if(matchLagst<gal.match(tarContent, curDNA[i])){	//find best match of this generation
+							matchLagst=gal.match(tarContent, curDNA[i]);	//and set it on GUI
+							dtrpnToBeOr.setText(curDNA[i]);					
+						}	
+							//System.out.println(i);		
+						if (i == (pop - 1)) {
+								
+						String newGeneDNA[]=new String[pop];
+						int newGenIndex =0;//if it's the last chinchila of this generation
+							for (int j = 0; j < pop / 2; j++) {
+									
+								int mama = gal.randomParent(				//select random mama and papa from this generation
+									gal.sumBreedingWeight(diffLagst, curDiff, pop), diffLagst,
+											curDiff);
+								int papa = gal.randomParent(
+									gal.sumBreedingWeight(diffLagst, curDiff, pop), diffLagst,
+											curDiff);
+								String mamaDNA = curDNA[mama];				//get string of this Index in curDNA array
+								String papaDNA = curDNA[papa];
+												
+								curDNA[newGenIndex]= gal.breeding(mamaDNA,papaDNA)[0];
+								newGenIndex++;
+								curDNA[newGenIndex]= gal.breeding(mamaDNA,papaDNA)[1];
+								newGenIndex++;
+									
+																		
+								}
+							genCounter++;
+							
+							i=0;//recycle
+							lblNewLabel_4.setText(Integer.toString(genCounter));
+							if (genCounter % 10 == 0){
+								
+								timer=genCounter/185;
+								
+								publish(String.valueOf(timer));
+								publish(String.valueOf(genCounter));
+								
+								
+							}
+							
+							}
+							
+							
+						}
+						
+					dtrpnToBeOr.setBackground(Color.PINK);
+					
+					return null;
+				}
+
+				@Override
+				protected void process(List<String> chunks) {
+					//if (flag == true)
+										
+					lblUpdateTime.setText(String.valueOf(chunks.get(0)));
+					if(Integer.parseInt(lblUpdateTime.getText())!=0){
+						int genSec=Integer.parseInt(chunks.get(1))/Integer.parseInt(lblUpdateTime.getText());
+						lblNewLabel_5.setText(String.valueOf(genSec));
+					}
+					//lblNewLabel_5.setText(String.valueOf(chunks.get(1)));
+					super.process(chunks);
+				}
+
+				@Override
+				protected void done() {
+					lblUpdateTime.setText("Job done");
+
+					btnNewButton.setText("Start");
+					btnNewButton.setActionCommand("Start");
+					chckbxNewCheckBox.setEnabled(true);
+					textField.setEnabled(true);
+					dtrpnToBeOr_1.setEnabled(true);
+					
+				}
+
+			};
+			sw1 = new SwingWorker<Void, String>() {
 				@Override
 				protected Void doInBackground() throws Exception {
 					
@@ -234,26 +354,12 @@ public class Chinchila_GUI extends JFrame implements ActionListener {
 							genCounter++;
 							
 							i=0;//recycle
-							lblNewLabel_4.setText(Integer.toString(genCounter));
-							if (genCounter % 10 == 0){
-								timer=genCounter/185;
-								publish(String.valueOf(timer));
-								
-							}
-//							if((genCounter/timer)% 10==0){
-//							lblNewLabel_5.setText(String.valueOf(genCounter/timer));	
-//							}
+							
 							}
 							
 							
 						}
 						
-							
-					
-						
-					
-						
-						//
 					
 					dtrpnToBeOr.setBackground(Color.PINK);
 					// ... the code being measured ...  
@@ -262,30 +368,168 @@ public class Chinchila_GUI extends JFrame implements ActionListener {
 					return null;
 				}
 
+			};
+
+			sw2 = new SwingWorker<Void, String>() {
 				@Override
-				protected void process(List<String> chunks) {
-					if (flag == true)
+				protected Void doInBackground() throws Exception {
 					
+					Chinchila_Genetic_algorithm gal = new Chinchila_Genetic_algorithm();
+					int timer=0;
+					int diffLagst = 0;
+					int matchLagst =0;
+					int genCounter=0;
+					int[] curDiff = new int[pop];			//set array size of  fitness for each chinchila 
+					String[] curDNA = new String[pop];		//set random string array size
+					
+					for(int i=0;i<pop;i++){
+					String curChiChi = gal.generateRandomMonkey(
+							tarContent.length(), gal.generateStrings());
+					curDNA[i] = curChiChi;
+				
+					}										//set random string to each chinchila DNA
+					
+					
+					
+					for (int i = 0; i < pop; i++) {	
 						
-					lblUpdateTime.setText(String.valueOf(chunks.get(0)));
+							if (this.isCancelled())
+								break;
+							if(dtrpnToBeOr_1.getText().equals(dtrpnToBeOr.getText()))
+								break;
+							if (diffLagst < gal.diff(tarContent, curDNA[i]))	//find largest difference of this generation
+								diffLagst = gal.diff(tarContent, curDNA[i]);		
+							
+							curDiff[i] = gal.diff(tarContent, curDNA[i]);		//store current difference to array
+							
+							if(matchLagst<gal.match(tarContent, curDNA[i])){	//find best match of this generation
+								matchLagst=gal.match(tarContent, curDNA[i]);	//and set it on GUI
+								dtrpnToBeOr.setText(curDNA[i]);					
+							}	
+							//System.out.println(i);		
+							if (i == (pop - 1)) {
+								
+								String newGeneDNA[]=new String[pop];
+								int newGenIndex =0;//if it's the last chinchila of this generation
+								for (int j = 0; j < pop / 2; j++) {
+									
+									int mama = gal.randomParent(				//select random mama and papa from this generation
+											gal.sumBreedingWeight(diffLagst, curDiff, pop), diffLagst,
+											curDiff);
+									int papa = gal.randomParent(
+											gal.sumBreedingWeight(diffLagst, curDiff, pop), diffLagst,
+											curDiff);
+									String mamaDNA = curDNA[mama];				//get string of this Index in curDNA array
+									String papaDNA = curDNA[papa];
+												
+									curDNA[newGenIndex]= gal.breeding(mamaDNA,papaDNA)[0];
+									newGenIndex++;
+									curDNA[newGenIndex]= gal.breeding(mamaDNA,papaDNA)[1];
+									newGenIndex++;
+									
+																		
+								}
+							genCounter++;
+							
+							i=0;//recycle
+							
+//							if((genCounter/timer)% 10==0&&(genCounter/timer)>0){
+//							lblNewLabel_5.setText(String.valueOf(genCounter/timer));	
+//							}
+							}
+							
+							
+						}
+						
 					
-					super.process(chunks);
-				}
-
-				@Override
-				protected void done() {
-					lblUpdateTime.setText("Job done");
-
-					btnNewButton.setText("Start");
-					btnNewButton.setActionCommand("Start");
-					chckbxNewCheckBox.setEnabled(true);
-					textField.setEnabled(true);
-					dtrpnToBeOr_1.setEnabled(true);
+					dtrpnToBeOr.setBackground(Color.PINK);
+					// ... the code being measured ...  
+					//
 					
+					return null;
 				}
 
 			};
+			sw3 = new SwingWorker<Void, String>() {
+				@Override
+				protected Void doInBackground() throws Exception {
+					
+					Chinchila_Genetic_algorithm gal = new Chinchila_Genetic_algorithm();
+					int timer=0;
+					int diffLagst = 0;
+					int matchLagst =0;
+					int genCounter=0;
+					int[] curDiff = new int[pop];			//set array size of  fitness for each chinchila 
+					String[] curDNA = new String[pop];		//set random string array size
+					
+					for(int i=0;i<pop;i++){
+					String curChiChi = gal.generateRandomMonkey(
+							tarContent.length(), gal.generateStrings());
+					curDNA[i] = curChiChi;
+				
+					}										//set random string to each chinchila DNA
+					
+					
+					
+					for (int i = 0; i < pop; i++) {	
+						
+							if (this.isCancelled())
+								break;
+							if(dtrpnToBeOr_1.getText().equals(dtrpnToBeOr.getText()))
+								break;
+							if (diffLagst < gal.diff(tarContent, curDNA[i]))	//find largest difference of this generation
+								diffLagst = gal.diff(tarContent, curDNA[i]);		
+							
+							curDiff[i] = gal.diff(tarContent, curDNA[i]);		//store current difference to array
+							
+							if(matchLagst<gal.match(tarContent, curDNA[i])){	//find best match of this generation
+								matchLagst=gal.match(tarContent, curDNA[i]);	//and set it on GUI
+								dtrpnToBeOr.setText(curDNA[i]);					
+							}	
+							//System.out.println(i);		
+							if (i == (pop - 1)) {
+								
+								String newGeneDNA[]=new String[pop];
+								int newGenIndex =0;//if it's the last chinchila of this generation
+								for (int j = 0; j < pop / 2; j++) {
+									
+									int mama = gal.randomParent(				//select random mama and papa from this generation
+											gal.sumBreedingWeight(diffLagst, curDiff, pop), diffLagst,
+											curDiff);
+									int papa = gal.randomParent(
+											gal.sumBreedingWeight(diffLagst, curDiff, pop), diffLagst,
+											curDiff);
+									String mamaDNA = curDNA[mama];				//get string of this Index in curDNA array
+									String papaDNA = curDNA[papa];
+												
+									curDNA[newGenIndex]= gal.breeding(mamaDNA,papaDNA)[0];
+									newGenIndex++;
+									curDNA[newGenIndex]= gal.breeding(mamaDNA,papaDNA)[1];
+									newGenIndex++;
+									
+																		
+								}
+							genCounter++;
+							
+							i=0;//recycle
+							
+//							if((genCounter/timer)% 10==0&&(genCounter/timer)>0){
+//							lblNewLabel_5.setText(String.valueOf(genCounter/timer));	
+//							}
+							}
+							
+							
+						}
+						
+					
+					dtrpnToBeOr.setBackground(Color.PINK);
+					// ... the code being measured ...  
+					//
+					
+					return null;
+				}
 
+			};
 			try {
 				if (pop < 1 || pop > 10000) {
 					JOptionPane
@@ -315,7 +559,14 @@ public class Chinchila_GUI extends JFrame implements ActionListener {
 			} catch (Exception e1) {
 
 			}
+			if (flag == true){
+				sw.execute();
+				sw1.execute();
+				sw2.execute();
+				sw3.execute();
+			}else{
 			sw.execute();
+			}
 		}
 	}
 }
